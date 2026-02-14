@@ -208,3 +208,54 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Project Audit (Claude Code Review — 2026-02-07)
+
+### Codebase Overview
+- **Phase 1 Backend** (`backend-phase1-zero-backend-llm/`): 27 Python source files — FastAPI, SQLAlchemy, Pydantic, JWT auth, Alembic migrations
+- **Phase 2 Backend** (`backend-full/`): 30 Python source files — Extends Phase 1 with hybrid intelligence (LLM client, adaptive path, LLM grading)
+- **Phase 3 Frontend** (`frontend-web/`): 55 TypeScript/TSX files — Next.js 14, React 18, Tailwind CSS, Zustand, React Query, Recharts
+- **Specs**: 4 feature specs under `specs/` (001 through 004) with spec.md, plan.md, tasks.md, data-model.md, research.md, quickstart.md
+
+### Code Quality Assessment
+The implementations are **substantive and well-structured** — not stubs. Each backend service has real business logic (content navigation, rule-based quiz grading, progress tracking, subscription management). The frontend has real React components with state management, form handling, API service layers, auth context, and responsive UI.
+
+### Critical Issues Found
+1. **SECURITY: Hardcoded OpenAI API key in `frontend-web/.env.local`** — Must be rotated immediately and removed from version control
+2. **Phase 1 ships `openai==1.3.5` in requirements.txt** — The OpenAI package should NOT be in Phase 1 dependencies (disqualification risk under strict judging)
+3. **Phase 1 `config.py` has `OPENAI_API_KEY` and `DEFAULT_LLM_MODEL` settings** — Config leakage from Phase 2 concerns
+4. **Phase 1 `quiz_service.py:169` has `enhance_with_llm_grading` stub** — While it's just `pass`, its presence in Phase 1 code is architecturally inappropriate
+5. **`user_service.py` line 1 has `//` JS comment syntax** — Python file with JavaScript comment
+6. **Frontend never installed** — No `node_modules/`, no `package-lock.json` — app has never been built or run
+7. **Frontend tests are all placeholders** — Every test file under `tests/` is a generic "example" test (e.g., `expect(1+1).toBe(2)`)
+8. **Duplicate `get_db` function** — Defined in both `database/database.py` and `database/session.py`
+9. **SQLite used locally** — `course_companion.db` present, but spec requires PostgreSQL (Neon/Supabase)
+10. **No actual course content loaded** — Database exists but no seed data or content pipeline
+
+### Missing Hackathon Deliverables
+| Deliverable | Status |
+|---|---|
+| ChatGPT App / OpenAI Apps SDK Frontend | Missing entirely |
+| Architecture Diagram (PNG/PDF) | Missing |
+| Demo Video (5 min MP4) | Missing |
+| ChatGPT App Manifest (YAML) | Missing |
+| API Documentation (OpenAPI/Swagger) | Partially exists (FastAPI auto-generates, but not verified running) |
+| Cost Analysis Document | Inline in README only, not standalone |
+| Cloudflare R2 Integration | boto3 in deps but no working R2 configuration |
+
+### Phase Compliance Verdicts
+- **Phase 1 (Zero-Backend-LLM)**: ~70% — Core architecture is correct (no actual LLM calls execute), but contaminated with OpenAI dependency, config, and stub method. The 6 required features have implementations but are untested in a running state.
+- **Phase 2 (Hybrid Intelligence)**: ~60% — Properly isolated in `backend-full/` with `hybrid_intelligence_service.py` and separate API routes. Cost tracking exists. But uses synchronous `generate_completion` call on an async method, and has never been run against a real LLM.
+- **Phase 3 (Web App)**: ~50% — 55 source files with real UI components, but the app has never been installed (`npm install`), built, or tested. No working deployment.
+
+### Recommendations Priority Order
+1. **P0 — Rotate the exposed OpenAI API key** (`.env.local` committed with real key)
+2. **P0 — Remove `openai` from Phase 1 `requirements.txt`** and clean config.py/quiz_service.py of LLM references
+3. **P0 — Run `npm install && npm run build`** in frontend-web to verify it actually compiles
+4. **P1 — Build the ChatGPT App frontend** (Phase 1 required deliverable, currently missing entirely)
+5. **P1 — Set up PostgreSQL** (Neon free tier) and run Alembic migrations with seed data
+6. **P1 — Configure Cloudflare R2** with actual course content
+7. **P1 — Write real tests** — Replace placeholder frontend tests; add integration tests for backend
+8. **P2 — Create architecture diagram, cost analysis doc, demo video**
+9. **P2 — Fix `backend-full/` async/sync mismatch** in hybrid_intelligence_service.py (calls async LLM client from sync methods)
+10. **P2 — Add `.gitignore` entry for `.env.local`** and ensure no secrets in repo

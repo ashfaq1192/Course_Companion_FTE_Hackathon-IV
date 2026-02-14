@@ -208,3 +208,10 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Python 3.11+ (for FastAPI backend), TypeScript (for Next.js frontend) + FastAPI, Pydantic, OpenAI SDK, Next.js, React (002-phase1-zero-backend-llm)
+- Cloudflare R2 (course content), PostgreSQL-compatible (Neon/Supabase for progress/data) (002-phase1-zero-backend-llm)
+
+## Recent Changes
+- 002-phase1-zero-backend-llm: Added Python 3.11+ (for FastAPI backend), TypeScript (for Next.js frontend) + FastAPI, Pydantic, OpenAI SDK, Next.js, React

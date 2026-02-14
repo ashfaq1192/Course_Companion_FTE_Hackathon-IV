@@ -1,0 +1,1077 @@
+# API Contracts: Phase 3 - Web App
+
+**Feature**: Phase 3 - Web App | **Date**: 2026-02-03
+**Input**: Feature specification from `/specs/spec.md`
+
+## Overview
+
+API contracts for the standalone Web App in the Course Companion FTE project. These contracts define the interface for web-specific features including dashboard widgets, progress visualization, admin panels, and responsive web components that build upon the existing Phase 1-2 backend services.
+
+## API Specification
+
+```yaml
+openapi: 3.0.3
+info:
+  title: Course Companion FTE - Web App API
+  description: API for standalone Web App with comprehensive LMS features
+  version: 1.0.0
+  contact:
+    name: Course Companion FTE Team
+
+servers:
+  - url: https://api.coursecompanionfte.com/api/v1
+    description: Production server
+  - url: https://staging.coursecompanionfte.com/api/v1
+    description: Staging server
+  - url: http://localhost:8000/api/v1
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Web App
+    description: Web-specific endpoints for dashboard and UI components
+  - name: Dashboard
+    description: Progress visualization and analytics endpoints
+  - name: Admin Panel
+    description: Administrative functions and course management
+  - name: Web Components
+    description: Responsive UI components and widgets
+
+paths:
+  # Inherit all existing endpoints from Phases 1-2
+  # Content endpoints (from Phase 1)
+  /content/{content_id}:
+    get:
+      tags:
+        - Content
+      summary: Get specific content
+      description: Retrieve course content by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Content retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseContent'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Content not found
+
+  /content/by-course/{course_id}:
+    get:
+      tags:
+        - Content
+      summary: Get content by course
+      description: Retrieve all content for a specific course
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: course_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Content retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseContent'
+        '401':
+          description: Unauthorized
+
+  /content/search:
+    get:
+      tags:
+        - Content
+      summary: Search content
+      description: Search for content by keyword
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            description: Search query
+      responses:
+        '200':
+          description: Search results retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CourseContent'
+        '401':
+          description: Unauthorized
+
+  # Progress endpoints (from Phase 1)
+  /progress/{content_id}:
+    get:
+      tags:
+        - Progress
+      summary: Get progress for content
+      description: Retrieve user progress for specific content
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Progress retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressRecord'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Progress record not found
+
+  /progress/{content_id}:
+    put:
+      tags:
+        - Progress
+      summary: Update progress for content
+      description: Update user progress for specific content
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [not_started, in_progress, completed]
+                completion_percentage:
+                  type: number
+                  minimum: 0
+                  maximum: 100
+                time_spent_seconds:
+                  type: integer
+                  minimum: 0
+      responses:
+        '200':
+          description: Progress updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressRecord'
+        '401':
+          description: Unauthorized
+
+  /progress/user/{user_id}:
+    get:
+      tags:
+        - Progress
+      summary: Get all progress for user
+      description: Retrieve all progress records for a specific user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: course_id
+          in: query
+          required: false
+          schema:
+            type: string
+            description: Filter by specific course
+      responses:
+        '200':
+          description: Progress records retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgressRecord'
+        '401':
+          description: Unauthorized
+
+  # Quiz endpoints (from Phase 1)
+  /quiz/{content_id}/start:
+    post:
+      tags:
+        - Quiz
+      summary: Start a quiz
+      description: Initialize a quiz attempt for the user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Quiz started successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttempt'
+        '401':
+          description: Unauthorized
+
+  /quiz/{content_id}/submit:
+    post:
+      tags:
+        - Quiz
+      summary: Submit quiz answers
+      description: Submit answers for a quiz and receive grading
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  question_id:
+                    type: integer
+                  answer:
+                    type: string
+      responses:
+        '200':
+          description: Quiz submitted and graded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attempt:
+                    $ref: '#/components/schemas/QuizAttempt'
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        question_id:
+                          type: integer
+                        user_answer:
+                          type: string
+                        is_correct:
+                          type: boolean
+                        explanation:
+                          type: string
+                  score:
+                    type: number
+        '401':
+          description: Unauthorized
+
+  /quiz/attempts/{attempt_id}:
+    get:
+      tags:
+        - Quiz
+      summary: Get quiz attempt details
+      description: Retrieve details of a specific quiz attempt
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: attempt_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Quiz attempt details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizAttempt'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Quiz attempt not found
+
+  # Subscription endpoints (from Phase 1)
+  /subscriptions/current:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get current user's subscription
+      description: Retrieves the current user's subscription information
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Subscription retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          description: Unauthorized
+        '404':
+          description: No subscription found
+
+  # Hybrid Intelligence endpoints (from Phase 2)
+  /hybrid/adaptive-path:
+    get:
+      tags:
+        - Hybrid Intelligence
+      summary: Get user's adaptive learning path
+      description: Retrieves personalized learning recommendations based on user progress and performance patterns
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Adaptive learning path retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdaptiveLearningPath'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User does not have premium subscription
+        '404':
+          description: No adaptive learning path found for the user
+
+  /hybrid/adaptive-path:
+    post:
+      tags:
+        - Hybrid Intelligence
+      summary: Generate new adaptive learning path
+      description: Creates a new personalized learning path based on user progress and preferences
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_preferences:
+                  type: object
+                  description: User preferences for learning path generation
+                  properties:
+                    learning_style:
+                      type: string
+                      enum: [visual, auditory, reading_writing, kinesthetic]
+                    pace:
+                      type: string
+                      enum: [slow, moderate, fast]
+                    interests:
+                      type: array
+                      items:
+                        type: string
+              required:
+                - user_preferences
+      responses:
+        '201':
+          description: Adaptive learning path generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdaptiveLearningPath'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User does not have premium subscription
+
+  /hybrid/llm-grade-assessment:
+    post:
+      tags:
+        - Hybrid Intelligence
+      summary: Grade assessment with LLM
+      description: Submit a free-form answer for LLM-based grading and feedback
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quiz_attempt_id:
+                  type: string
+                  format: uuid
+                question_id:
+                  type: string
+                  format: uuid
+                answer_text:
+                  type: string
+                context:
+                  type: object
+                  properties:
+                    course_content:
+                      type: string
+                    question_type:
+                      type: string
+              required:
+                - quiz_attempt_id
+                - question_id
+                - answer_text
+      responses:
+        '201':
+          description: Assessment graded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMGradeAssessment'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - User does not have premium subscription
+
+  # Web App specific endpoints
+  /web/dashboard/widgets:
+    get:
+      tags:
+        - Web App
+      summary: Get dashboard widgets
+      description: Retrieve widgets for the user dashboard
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+            description: User ID to get widgets for (admin only, defaults to current user)
+      responses:
+        '200':
+          description: Dashboard widgets retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DashboardWidget'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Insufficient permissions
+
+  /web/progress/visualization:
+    get:
+      tags:
+        - Web App
+      summary: Get progress visualization data
+      description: Retrieve data formatted for visualization on the web app
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+            description: User ID to get visualization for (admin only, defaults to current user)
+        - name: time_range
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [week, month, quarter, year]
+            default: month
+            description: Time range for visualization
+      responses:
+        '200':
+          description: Progress visualization data retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProgressVisualization'
+        '401':
+          description: Unauthorized
+
+  /web/admin/courses:
+    get:
+      tags:
+        - Admin Panel
+      summary: Get courses for admin panel
+      description: Retrieve courses with admin-specific data
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Courses retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminCourse'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Insufficient permissions
+
+  /web/admin/users:
+    get:
+      tags:
+        - Admin Panel
+      summary: Get users for admin panel
+      description: Retrieve users with admin-specific data
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdminUser'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden - Insufficient permissions
+
+  /web/responsive/layout:
+    get:
+      tags:
+        - Web Components
+      summary: Get responsive layout configuration
+      description: Retrieve layout configuration based on device characteristics
+      parameters:
+        - name: device_width
+          in: query
+          required: true
+          schema:
+            type: integer
+            description: Width of the device viewport in pixels
+        - name: device_height
+          in: query
+          required: true
+          schema:
+            type: integer
+            description: Height of the device viewport in pixels
+        - name: device_type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [mobile, tablet, desktop, tv]
+            description: Type of device (optional, inferred from dimensions if not provided)
+      responses:
+        '200':
+          description: Layout configuration retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResponsiveLayout'
+        '400':
+          description: Invalid device dimensions provided
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    # Reuse schemas from Phases 1-2
+    CourseContent:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content_type:
+          type: string
+        content_data:
+          type: string
+        course_id:
+          type: string
+        chapter_number:
+          type: integer
+        section_number:
+          type: integer
+        is_available:
+          type: boolean
+      required:
+        - id
+        - title
+        - content_type
+        - content_data
+        - course_id
+        - chapter_number
+        - is_available
+
+    ProgressRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        content_id:
+          type: integer
+        status:
+          type: string
+          enum: [not_started, in_progress, completed]
+        completion_percentage:
+          type: number
+          minimum: 0
+          maximum: 100
+        time_spent_seconds:
+          type: integer
+        last_accessed:
+          type: string
+          format: date-time
+      required:
+        - id
+        - user_id
+        - content_id
+        - status
+        - completion_percentage
+        - time_spent_seconds
+
+    QuizAttempt:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        content_id:
+          type: integer
+        score:
+          type: number
+        total_questions:
+          type: integer
+        correct_answers:
+          type: integer
+        attempt_date:
+          type: string
+          format: date-time
+        time_taken_seconds:
+          type: integer
+        answers:
+          type: string
+      required:
+        - id
+        - user_id
+        - content_id
+        - score
+        - total_questions
+        - correct_answers
+        - attempt_date
+        - time_taken_seconds
+        - answers
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        subscription_type:
+          type: string
+          enum: [free, premium]
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+      required:
+        - id
+        - user_id
+        - subscription_type
+        - start_date
+        - is_active
+
+    AdaptiveLearningPath:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        generated_at:
+          type: string
+          format: date-time
+        recommended_courses:
+          type: array
+          items:
+            type: object
+            properties:
+              course_id:
+                type: string
+                format: uuid
+              priority:
+                type: integer
+              reason:
+                type: string
+        reasoning:
+          type: string
+        valid_until:
+          type: string
+          format: date-time
+        is_active:
+          type: boolean
+        cost_usd:
+          type: number
+          format: decimal
+      required:
+        - id
+        - user_id
+        - generated_at
+        - recommended_courses
+        - is_active
+
+    LLMGradeAssessment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        quiz_attempt_id:
+          type: string
+          format: uuid
+        question_id:
+          type: string
+          format: uuid
+        original_response:
+          type: string
+        llm_grade:
+          type: object
+          properties:
+            score:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+            feedback:
+              type: string
+            strengths:
+              type: array
+              items:
+                type: string
+            areas_for_improvement:
+              type: array
+              items:
+                type: string
+        graded_at:
+          type: string
+          format: date-time
+        cost_usd:
+          type: number
+          format: decimal
+        is_valid:
+          type: boolean
+      required:
+        - id
+        - user_id
+        - quiz_attempt_id
+        - question_id
+        - original_response
+        - llm_grade
+        - graded_at
+        - is_valid
+
+    # New schemas for Phase 3
+    DashboardWidget:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        widget_type:
+          type: string
+          enum: [progress_chart, recent_activity, upcoming_deadlines, achievements]
+        title:
+          type: string
+        config:
+          type: object
+          description: Widget-specific configuration
+        position:
+          type: object
+          properties:
+            x:
+              type: integer
+            y:
+              type: integer
+            width:
+              type: integer
+            height:
+              type: integer
+        data_source:
+          type: string
+          description: API endpoint for widget data
+      required:
+        - id
+        - widget_type
+        - title
+        - position
+        - data_source
+
+    ProgressVisualization:
+      type: object
+      properties:
+        time_series:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              completed_items:
+                type: integer
+              time_spent_minutes:
+                type: integer
+              average_score:
+                type: number
+        course_breakdown:
+          type: array
+          items:
+            type: object
+            properties:
+              course_id:
+                type: string
+              course_title:
+                type: string
+              completion_percentage:
+                type: number
+              time_spent_hours:
+                type: number
+        achievement_badges:
+          type: array
+          items:
+            type: object
+            properties:
+              badge_id:
+                type: string
+              name:
+                type: string
+              earned_date:
+                type: string
+                format: date
+              description:
+                type: string
+        overall_stats:
+          type: object
+          properties:
+            total_courses:
+              type: integer
+            completed_courses:
+              type: integer
+            total_hours_learned:
+              type: number
+            average_completion_rate:
+              type: number
+            current_streak_days:
+              type: integer
+      required:
+        - time_series
+        - course_breakdown
+        - overall_stats
+
+    AdminCourse:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        enrollment_count:
+          type: integer
+        completion_rate:
+          type: number
+        avg_rating:
+          type: number
+        is_published:
+          type: boolean
+        content_count:
+          type: integer
+      required:
+        - id
+        - title
+        - created_at
+        - enrollment_count
+        - is_published
+
+    AdminUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        full_name:
+          type: string
+        is_active:
+          type: boolean
+        join_date:
+          type: string
+          format: date-time
+        last_login:
+          type: string
+          format: date-time
+        courses_enrolled:
+          type: integer
+        courses_completed:
+          type: integer
+        avg_quiz_score:
+          type: number
+        subscription_type:
+          type: string
+          enum: [free, premium]
+      required:
+        - id
+        - email
+        - full_name
+        - is_active
+        - join_date
+
+    ResponsiveLayout:
+      type: object
+      properties:
+        breakpoints:
+          type: object
+          properties:
+            mobile:
+              type: integer
+            tablet:
+              type: integer
+            desktop:
+              type: integer
+        grid_columns:
+          type: integer
+          description: Number of grid columns for the current layout
+        component_configs:
+          type: array
+          items:
+            type: object
+            properties:
+              component_name:
+                type: string
+              visible:
+                type: boolean
+              props:
+                type: object
+                description: Component-specific props for this layout
+        navigation_style:
+          type: string
+          enum: [sidebar, topbar, hamburger]
+      required:
+        - breakpoints
+        - grid_columns
+        - component_configs
+        - navigation_style
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message
+      required:
+        - detail
+```

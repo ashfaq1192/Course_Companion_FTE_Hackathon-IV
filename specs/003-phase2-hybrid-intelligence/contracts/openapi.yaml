@@ -1,0 +1,393 @@
+# API Contracts: Phase 2 - Hybrid Intelligence
+
+**Feature**: Phase 2 - Hybrid Intelligence | **Date**: 2026-02-03
+**Input**: Feature specification from `/specs/003-phase2-hybrid-intelligence/spec.md`
+
+## Overview
+
+API contracts for hybrid intelligence features in the Course Companion FTE project. These contracts define the interface for adaptive learning paths, LLM-graded assessments, and cost tracking features that are restricted to premium subscribers.
+
+## API Specification
+
+```yaml
+openapi: 3.0.3
+info:
+  title: Course Companion FTE - Hybrid Intelligence API
+  description: API for hybrid intelligence features including adaptive learning paths and LLM-graded assessments
+  version: 1.0.0
+  contact:
+    name: Course Companion FTE Team
+
+servers:
+  - url: https://api.coursecompanionfte.com/api/v1
+    description: Production server
+  - url: https://staging.coursecompanionfte.com/api/v1
+    description: Staging server
+  - url: http://localhost:8000/api/v1
+    description: Development server
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Hybrid Intelligence
+    description: Adaptive learning paths and LLM-graded assessments
+  - name: Cost Tracking
+    description: Cost metrics and usage tracking for hybrid features
+  - name: Premium Access
+    description: Access control for premium subscribers
+
+paths:
+  /hybrid/adaptive-path:
+    get:
+      tags:
+        - Hybrid Intelligence
+      summary: Get user's adaptive learning path
+      description: Retrieves personalized learning recommendations based on user progress and performance patterns
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Adaptive learning path retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdaptiveLearningPath'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - User does not have premium subscription
+        '404':
+          description: No adaptive learning path found for the user
+        '429':
+          description: Rate limit exceeded
+    post:
+      tags:
+        - Hybrid Intelligence
+      summary: Generate new adaptive learning path
+      description: Creates a new personalized learning path based on user progress and preferences
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_preferences:
+                  type: object
+                  description: User preferences for learning path generation
+                  properties:
+                    learning_style:
+                      type: string
+                      enum: [visual, auditory, reading_writing, kinesthetic]
+                      description: Preferred learning style
+                    pace:
+                      type: string
+                      enum: [slow, moderate, fast]
+                      description: Preferred learning pace
+                    interests:
+                      type: array
+                      items:
+                        type: string
+                      description: Subject interests to prioritize
+              required:
+                - user_preferences
+      responses:
+        '201':
+          description: Adaptive learning path generated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdaptiveLearningPath'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - User does not have premium subscription
+        '422':
+          description: Unprocessable entity - Invalid request parameters
+        '429':
+          description: Rate limit exceeded
+
+  /hybrid/llm-grade-assessment:
+    post:
+      tags:
+        - Hybrid Intelligence
+      summary: Grade assessment with LLM
+      description: Submit a free-form answer for LLM-based grading and feedback
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quiz_attempt_id:
+                  type: string
+                  format: uuid
+                  description: ID of the quiz attempt
+                question_id:
+                  type: string
+                  format: uuid
+                  description: ID of the question being answered
+                answer_text:
+                  type: string
+                  description: Free-form answer text to be graded
+                context:
+                  type: object
+                  description: Additional context for grading
+                  properties:
+                    course_content:
+                      type: string
+                      description: Relevant course content for context
+                    question_type:
+                      type: string
+                      description: Type of question (essay, short_answer, etc.)
+              required:
+                - quiz_attempt_id
+                - question_id
+                - answer_text
+      responses:
+        '201':
+          description: Assessment graded successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LLMGradeAssessment'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - User does not have premium subscription
+        '422':
+          description: Unprocessable entity - Invalid request parameters
+        '429':
+          description: Rate limit exceeded
+
+  /hybrid/cost-metrics:
+    get:
+      tags:
+        - Cost Tracking
+      summary: Get cost metrics for user
+      description: Retrieves cost metrics for hybrid feature usage for the authenticated user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: period_start
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            description: Start date for metrics period (defaults to current month)
+        - name: period_end
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+            description: End date for metrics period (defaults to current month)
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+            description: User ID to get metrics for (admin only, defaults to current user)
+      responses:
+        '200':
+          description: Cost metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CostMetric'
+        '401':
+          description: Unauthorized - Invalid or missing authentication token
+        '403':
+          description: Forbidden - Insufficient permissions to view requested user metrics
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AdaptiveLearningPath:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the adaptive learning path
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user who receives this path
+        generated_at:
+          type: string
+          format: date-time
+          description: Timestamp when the path was generated
+        recommended_courses:
+          type: array
+          items:
+            type: object
+            properties:
+              course_id:
+                type: string
+                format: uuid
+                description: ID of the recommended course
+              priority:
+                type: integer
+                description: Priority level of the recommendation (1-10)
+              reason:
+                type: string
+                description: Reason for the recommendation
+        reasoning:
+          type: string
+          description: Explanation of why these recommendations were made
+        valid_until:
+          type: string
+          format: date-time
+          description: Expiration date for the recommendations
+        is_active:
+          type: boolean
+          description: Whether the path is currently valid
+        cost_usd:
+          type: number
+          format: decimal
+          description: Cost incurred to generate this path
+      required:
+        - id
+        - user_id
+        - generated_at
+        - recommended_courses
+        - is_active
+
+    LLMGradeAssessment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the LLM grade assessment
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user whose response was graded
+        quiz_attempt_id:
+          type: string
+          format: uuid
+          description: ID of the original quiz attempt
+        question_id:
+          type: string
+          format: uuid
+          description: ID of the specific question that was LLM-graded
+        original_response:
+          type: string
+          description: The user's original free-form response
+        llm_grade:
+          type: object
+          description: Detailed grading from the LLM
+          properties:
+            score:
+              type: number
+              format: float
+              minimum: 0
+              maximum: 1
+              description: Normalized score (0.0 to 1.0)
+            feedback:
+              type: string
+              description: Detailed feedback from the LLM
+            strengths:
+              type: array
+              items:
+                type: string
+              description: Points the response did well on
+            areas_for_improvement:
+              type: array
+              items:
+                type: string
+              description: Areas where the response could improve
+        graded_at:
+          type: string
+          format: date-time
+          description: Timestamp when the LLM grading was completed
+        cost_usd:
+          type: number
+          format: decimal
+          description: Cost incurred to perform the LLM grading
+        is_valid:
+          type: boolean
+          description: Whether this grade is still considered valid
+      required:
+        - id
+        - user_id
+        - quiz_attempt_id
+        - question_id
+        - original_response
+        - llm_grade
+        - graded_at
+        - is_valid
+
+    CostMetric:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the cost metric
+        user_id:
+          type: string
+          format: uuid
+          description: ID of the user this metric applies to
+        metric_period_start:
+          type: string
+          format: date
+          description: Start date of the metric period
+        metric_period_end:
+          type: string
+          format: date
+          description: End date of the metric period
+        total_cost_usd:
+          type: number
+          format: decimal
+          description: Total cost incurred during the period
+        total_tokens:
+          type: integer
+          description: Total tokens consumed during the period
+        feature_breakdown:
+          type: object
+          description: Cost breakdown by feature type
+          additionalProperties:
+            type: number
+            format: decimal
+            description: Cost for each feature type
+        calculated_at:
+          type: string
+          format: date-time
+          description: When the metrics were calculated
+      required:
+        - id
+        - user_id
+        - metric_period_start
+        - metric_period_end
+        - total_cost_usd
+        - total_tokens
+        - feature_breakdown
+        - calculated_at
+
+    Error:
+      type: object
+      properties:
+        detail:
+          type: string
+          description: Human-readable error message
+      required:
+        - detail
+```

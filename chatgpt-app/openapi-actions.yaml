@@ -1,0 +1,571 @@
+openapi: 3.1.0
+info:
+  title: Course Companion FTE API
+  description: Backend API for the Course Companion FTE educational platform. Provides content delivery, quiz management, progress tracking, and subscription management.
+  version: 1.0.0
+servers:
+  - url: https://your-deployment-url.com/api/v1
+    description: Production server (replace with your actual deployment URL)
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+paths:
+  /register:
+    post:
+      operationId: registerUser
+      summary: Register a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, full_name, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                full_name:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Email already registered
+
+  /login:
+    post:
+      operationId: loginUser
+      summary: Authenticate and get access token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                full_name:
+                  type: string
+                  description: Required by schema but not used for login
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Token"
+        "401":
+          description: Invalid credentials
+
+  /content/{content_id}:
+    get:
+      operationId: getContent
+      summary: Get specific course content by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Content retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseContent"
+        "404":
+          description: Content not found
+
+  /content/by-course/{course_id}:
+    get:
+      operationId: getCourseContent
+      summary: List all content for a course
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: course_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 100
+            maximum: 100
+      responses:
+        "200":
+          description: Course content list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseContent"
+
+  /content/search:
+    get:
+      operationId: searchContent
+      summary: Search content by keywords
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: course_id
+          in: query
+          schema:
+            type: string
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+            maximum: 50
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseContent"
+
+  /content/{content_id}/next:
+    get:
+      operationId: getNextContent
+      summary: Get next content in sequence
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Next content item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseContent"
+        "404":
+          description: No next content available
+
+  /content/{content_id}/prev:
+    get:
+      operationId: getPreviousContent
+      summary: Get previous content in sequence
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Previous content item
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseContent"
+        "404":
+          description: No previous content available
+
+  /content/grounded-qna:
+    post:
+      operationId: groundedQA
+      summary: Find content sections relevant to a student's question
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+        - name: course_id
+          in: query
+          schema:
+            type: string
+        - name: max_results
+          in: query
+          schema:
+            type: integer
+            default: 5
+            minimum: 1
+            maximum: 10
+      responses:
+        "200":
+          description: Relevant content sections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseContent"
+
+  /quiz/{content_id}/start:
+    post:
+      operationId: startQuiz
+      summary: Start a new quiz attempt for a content item
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Quiz attempt started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/QuizAttempt"
+
+  /quiz/{content_id}/submit:
+    post:
+      operationId: submitQuiz
+      summary: Submit quiz answers for grading
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                required: [question_id, answer]
+                properties:
+                  question_id:
+                    type: string
+                  answer:
+                    type: string
+      responses:
+        "200":
+          description: Quiz grading result
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: Content not found
+
+  /quiz/attempts/{attempt_id}:
+    get:
+      operationId: getQuizAttempt
+      summary: Get details of a specific quiz attempt
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: attempt_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Quiz attempt details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  attempt:
+                    $ref: "#/components/schemas/QuizAttempt"
+        "404":
+          description: Attempt not found
+        "403":
+          description: Not authorized to view this attempt
+
+  /progress/{content_id}:
+    get:
+      operationId: getProgress
+      summary: Get progress for a specific content item
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Progress record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgressRecord"
+        "404":
+          description: No progress record found
+    put:
+      operationId: updateProgress
+      summary: Update progress for a content item
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: status
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [not_started, in_progress, completed]
+        - name: completion_percentage
+          in: query
+          schema:
+            type: number
+            default: 0
+            minimum: 0
+            maximum: 100
+        - name: time_spent_seconds
+          in: query
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        "200":
+          description: Progress updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgressRecord"
+
+  /progress/user/{user_id}:
+    get:
+      operationId: getUserProgress
+      summary: Get all progress records for a user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: course_id
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User progress records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProgressRecord"
+        "403":
+          description: Not authorized to view this user's progress
+
+  /subscriptions/current:
+    get:
+      operationId: getCurrentSubscription
+      summary: Get current user's subscription details
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Subscription details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Subscription"
+        "404":
+          description: No subscription found
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        full_name:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Token:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+
+    CourseContent:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content_type:
+          type: string
+          enum: [text, video, quiz, exercise]
+        content_data:
+          type: string
+        course_id:
+          type: string
+        chapter_number:
+          type: integer
+        section_number:
+          type: integer
+        is_available:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    QuizAttempt:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        content_id:
+          type: integer
+        score:
+          type: number
+        total_questions:
+          type: integer
+        correct_answers:
+          type: integer
+        attempt_date:
+          type: string
+          format: date-time
+        time_taken_seconds:
+          type: integer
+        answers:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    ProgressRecord:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        content_id:
+          type: integer
+        status:
+          type: string
+          enum: [not_started, in_progress, completed]
+        completion_percentage:
+          type: number
+        time_spent_seconds:
+          type: integer
+        last_accessed_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        subscription_type:
+          type: string
+          enum: [free, premium]
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        is_active:
+          type: boolean
+        payment_status:
+          type: string
+          enum: [pending, paid, failed]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time

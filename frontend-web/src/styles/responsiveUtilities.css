@@ -1,0 +1,312 @@
+/* Responsive Typography Utilities */
+.text-responsive-sm {
+  font-size: clamp(0.8rem, 2vw, 1rem);
+}
+
+.text-responsive-base {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+}
+
+.text-responsive-lg {
+  font-size: clamp(1.125rem, 3vw, 1.25rem);
+}
+
+.text-responsive-xl {
+  font-size: clamp(1.25rem, 4vw, 1.5rem);
+}
+
+.text-responsive-2xl {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+}
+
+.text-responsive-3xl {
+  font-size: clamp(2rem, 6vw, 3rem);
+}
+
+/* Responsive Spacing Utilities */
+.padding-responsive-sm {
+  padding: clamp(0.25rem, 1vw, 0.5rem);
+}
+
+.padding-responsive-md {
+  padding: clamp(0.5rem, 2vw, 1rem);
+}
+
+.padding-responsive-lg {
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.margin-responsive-sm {
+  margin: clamp(0.25rem, 1vw, 0.5rem);
+}
+
+.margin-responsive-md {
+  margin: clamp(0.5rem, 2vw, 1rem);
+}
+
+.margin-responsive-lg {
+  margin: clamp(1rem, 3vw, 1.5rem);
+}
+
+/* Responsive Container Utilities */
+.container-fluid {
+  width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container-sm {
+  max-width: 540px;
+  width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container-md {
+  max-width: 720px;
+  width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container-lg {
+  max-width: 960px;
+  width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container-xl {
+  max-width: 1140px;
+  width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.container-xxl {
+  max-width: 1320px;
+  width: 100%;
+  padding-right: calc(var(--bs-gutter-x) * 0.5);
+  padding-left: calc(var(--bs-gutter-x) * 0.5);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* Responsive Grid Utilities */
+.grid-cols-responsive {
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: 1rem;
+}
+
+.grid-cols-responsive-sm {
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  gap: 0.5rem;
+}
+
+.grid-cols-responsive-lg {
+  grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+  gap: 1.5rem;
+}
+
+/* Responsive Flex Utilities */
+.flex-direction-responsive {
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .flex-direction-responsive {
+    flex-direction: row;
+  }
+}
+
+.justify-content-responsive {
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .justify-content-responsive {
+    justify-content: flex-start;
+  }
+}
+
+/* Responsive Display Utilities */
+.hidden-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hidden-mobile {
+    display: block;
+  }
+}
+
+.hidden-tablet {
+  display: block;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hidden-tablet {
+    display: none;
+  }
+}
+
+.hidden-desktop {
+  display: block;
+}
+
+@media (min-width: 1024px) {
+  .hidden-desktop {
+    display: none;
+  }
+}
+
+.show-mobile {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .show-mobile {
+    display: none;
+  }
+}
+
+.show-tablet {
+  display: none;
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .show-tablet {
+    display: block;
+  }
+}
+
+.show-desktop {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .show-desktop {
+    display: block;
+  }
+}
+
+/* Responsive Height Utilities */
+.height-responsive {
+  height: auto;
+  min-height: 100vh;
+}
+
+@media (min-width: 768px) {
+  .height-responsive {
+    height: 100vh;
+    min-height: unset;
+  }
+}
+
+/* Responsive Width Utilities */
+.width-full-mobile {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .width-full-mobile {
+    width: auto;
+  }
+}
+
+/* Responsive Image Utilities */
+.image-responsive {
+  max-width: 100%;
+  height: auto;
+}
+
+.image-full-width {
+  width: 100%;
+  height: auto;
+}
+
+/* Responsive Button Utilities */
+.button-responsive {
+  width: 100%;
+  padding: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .button-responsive {
+    width: auto;
+    padding: 0.5rem 1rem;
+  }
+}
+
+/* Responsive Card Utilities */
+.card-responsive {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .card-responsive {
+    margin-bottom: 0;
+  }
+}
+
+/* Responsive Form Utilities */
+.form-field-responsive {
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 640px) {
+  .form-field-responsive {
+    margin-bottom: 0;
+  }
+}
+
+/* Responsive Table Utilities */
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-responsive > table {
+  min-width: 600px;
+}
+
+/* Responsive Modal Utilities */
+.modal-responsive {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-content-responsive {
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+@media (min-width: 768px) {
+  .modal-content-responsive {
+    max-width: 600px;
+  }
+}

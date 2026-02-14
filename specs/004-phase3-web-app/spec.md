@@ -125,13 +125,13 @@ The web application must work seamlessly across different devices and be accessi
 
 ### Measurable Outcomes
 
-- **SC-001**: Web application achieves 99.9% uptime and loads in under 3 seconds
-- **SC-002**: Dashboard displays progress metrics with 95%+ user satisfaction rating
-- **SC-003**: Admin features allow management of 1000+ students and courses efficiently
-- **SC-004**: 90% of users can successfully navigate and use core features without instruction
-- **SC-005**: Application supports 10,000+ concurrent users without performance degradation
-- **SC-006**: Mobile responsiveness works across 95% of common device configurations
-- **SC-007**: Accessibility features meet WCAG 2.1 AA compliance standards
-- **SC-008**: User progress synchronizes across ChatGPT App and Web App in real-time
-- **SC-009**: Students using the web app show 20% higher completion rates than other interfaces
-- **SC-010**: 85% of users rate the web app experience as good or excellent
+- **SC-001**: Web application achieves 99.9% uptime and loads in under 3 seconds (measured on 3G network simulation, cold start, average of 10 runs)
+- **SC-002**: Dashboard displays progress metrics with 95%+ user satisfaction rating (measured via post-interaction survey, n=500 users)
+- **SC-003**: Admin features allow management of 1000+ students and courses efficiently (page load <2s with 1000+ records)
+- **SC-004**: 90% of users can successfully navigate and use core features without instruction (measured in usability study)
+- **SC-005**: Application supports 10,000+ concurrent users without performance degradation (measured via load testing)
+- **SC-006**: Mobile responsiveness works across 95% of common device configurations (tested on top 10 mobile devices/browsers)
+- **SC-007**: Accessibility features meet WCAG 2.1 AA compliance standards (validated with automated and manual testing)
+- **SC-008**: User progress synchronizes across ChatGPT App and Web App in real-time (sync delay <5 seconds)
+- **SC-009**: Students using the web app show 20% higher completion rates than other interfaces (measured over 3-month period)
+- **SC-010**: 85% of users rate the web app experience as good or excellent (measured via Net Promoter Score survey)

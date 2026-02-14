@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Course Companion FTE - Architecture Diagram</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #fff;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #1a1a2e;
+    font-size: 24px;
+    margin-bottom: 4px;
+  }
+  h2 {
+    text-align: center;
+    color: #555;
+    font-size: 14px;
+    font-weight: normal;
+    margin-top: 0;
+  }
+  .diagrams {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+  }
+  .diagram-section {
+    width: 100%;
+    max-width: 900px;
+  }
+  .diagram-section h3 {
+    color: #1a1a2e;
+    border-bottom: 2px solid #4361ee;
+    padding-bottom: 6px;
+    font-size: 18px;
+  }
+  .mermaid {
+    display: flex;
+    justify-content: center;
+  }
+  .footer {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    margin-top: 30px;
+  }
+  @media print {
+    body { padding: 10px; }
+    .diagram-section { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<h1>Course Companion FTE - System Architecture</h1>
+<h2>Agent Factory Hackathon IV | Dual-Frontend + Zero-Backend-LLM Architecture</h2>
+
+<div class="diagrams">
+
+<div class="diagram-section">
+<h3>Phase 1: Zero-Backend-LLM (ChatGPT App)</h3>
+<div class="mermaid">
+graph TB
+    subgraph "User Layer"
+        U["👤 Student"]
+    end
+
+    subgraph "Frontend: ChatGPT App"
+        CG["🤖 ChatGPT Custom GPT<br/><i>All LLM reasoning happens here</i>"]
+        SK["📋 Agent Skills<br/>concept-explainer | quiz-master<br/>socratic-tutor | progress-motivator"]
+    end
+
+    subgraph "Backend: FastAPI (Deterministic)"
+        API["🔌 REST API Gateway<br/>FastAPI + OpenAPI"]
+        subgraph "Core Services (Zero LLM)"
+            CS["📚 Content Service<br/>Serve verbatim content"]
+            NS["🧭 Navigation Service<br/>Chapter sequencing"]
+            QS["📝 Quiz Service<br/>Rule-based grading"]
+            PS["📊 Progress Service<br/>Completion & streaks"]
+            SS["🔍 Search Service<br/>Keyword search"]
+            FS["🔒 Freemium Gate<br/>Access control"]
+        end
+        AUTH["🔐 JWT Auth<br/>OAuth 2.0"]
+    end
+
+    subgraph "Data Layer"
+        DB[("🗄️ PostgreSQL<br/>Neon/Supabase")]
+        R2["☁️ Cloudflare R2<br/>Course content & media"]
+    end
+
+    U --> CG
+    CG --> SK
+    CG --> API
+    API --> AUTH
+    API --> CS & NS & QS & PS & SS & FS
+    CS --> DB
+    CS --> R2
+    NS --> DB
+    QS --> DB
+    PS --> DB
+    SS --> DB
+    FS --> DB
+
+    style CG fill:#10a37f,color:#fff,stroke:#0d8c6d
+    style API fill:#4361ee,color:#fff,stroke:#3a56d4
+    style DB fill:#336791,color:#fff,stroke:#2a567a
+    style R2 fill:#f38020,color:#fff,stroke:#d97118
+    style AUTH fill:#e63946,color:#fff,stroke:#cc3340
+</div>
+</div>
+
+<div class="diagram-section">
+<h3>Phase 2: Hybrid Intelligence (Premium Features)</h3>
+<div class="mermaid">
+graph TB
+    subgraph "ChatGPT App Frontend"
+        CG2["🤖 ChatGPT Custom GPT"]
+    end
+
+    subgraph "Backend: FastAPI"
+        API2["🔌 API Gateway"]
+        subgraph "Phase 1: Deterministic APIs"
+            D1["📚 Content | 🧭 Nav | 📝 Quiz"]
+            D2["📊 Progress | 🔍 Search | 🔒 Gate"]
+        end
+        subgraph "Phase 2: Hybrid Intelligence APIs (Premium)"
+            ALP["🧠 Adaptive Learning Path<br/><i>Personalized recommendations</i><br/>via LLM reasoning"]
+            LGA["📝 LLM-Graded Assessments<br/><i>Free-form answer evaluation</i><br/>with detailed feedback"]
+            CT["💰 Cost Tracker<br/>Per-user LLM usage monitoring"]
+        end
+        PG["🔒 Premium Gate<br/>Subscription check"]
+    end
+
+    subgraph "LLM Provider"
+        LLM["🧠 Claude Sonnet API<br/>$0.014 - $0.090 per request"]
+    end
+
+    subgraph "Data Layer"
+        DB2[("🗄️ PostgreSQL")]
+        R22["☁️ Cloudflare R2"]
+    end
+
+    CG2 --> API2
+    API2 --> D1 & D2
+    API2 --> PG
+    PG --> ALP & LGA
+    ALP --> LLM
+    LGA --> LLM
+    ALP --> CT
+    LGA --> CT
+    D1 --> DB2
+    D2 --> DB2
+    CT --> DB2
+    D1 --> R22
+
+    style ALP fill:#7b2cbf,color:#fff,stroke:#6a24a6
+    style LGA fill:#7b2cbf,color:#fff,stroke:#6a24a6
+    style LLM fill:#d4a574,color:#1a1a2e,stroke:#c49564
+    style PG fill:#e63946,color:#fff,stroke:#cc3340
+    style CT fill:#2a9d8f,color:#fff,stroke:#248f82
+</div>
+</div>
+
+<div class="diagram-section">
+<h3>Phase 3: Web App (Full End-to-End)</h3>
+<div class="mermaid">
+graph TB
+    subgraph "User Layer"
+        U3["👤 Student / Admin"]
+    end
+
+    subgraph "Web Frontend: Next.js 14"
+        WEB["🌐 Next.js App Router<br/>React 18 + TypeScript"]
+        subgraph "Frontend Features"
+            DASH["📊 Dashboard<br/>Progress overview & analytics"]
+            CONT["📚 Content Viewer<br/>Rich text rendering"]
+            QUIZ["📝 Quiz Interface<br/>Interactive assessments"]
+            PROG["📈 Progress Tracking<br/>Charts & achievements"]
+            ADMIN["⚙️ Admin Panel<br/>Course management"]
+        end
+        subgraph "State & Services"
+            ZUS["🏪 Zustand Store"]
+            RQ["🔄 React Query"]
+            APIS["📡 API Service Layer"]
+        end
+    end
+
+    subgraph "Backend: FastAPI (Consolidated)"
+        API3["🔌 REST API<br/>All Phase 1 + 2 endpoints"]
+        subgraph "All Services"
+            SVC["📚 Content | 🧭 Nav | 📝 Quiz<br/>📊 Progress | 🔍 Search | 🔒 Gate<br/>🧠 Adaptive Path | 📝 LLM Grade"]
+        end
+        AUTH3["🔐 JWT Auth"]
+    end
+
+    subgraph "External"
+        LLM3["🧠 LLM API"]
+        DB3[("🗄️ PostgreSQL")]
+        R23["☁️ Cloudflare R2"]
+    end
+
+    U3 --> WEB
+    WEB --> DASH & CONT & QUIZ & PROG & ADMIN
+    DASH & CONT & QUIZ & PROG & ADMIN --> ZUS & RQ
+    ZUS & RQ --> APIS
+    APIS --> API3
+    API3 --> AUTH3
+    API3 --> SVC
+    SVC --> LLM3
+    SVC --> DB3
+    SVC --> R23
+
+    style WEB fill:#000,color:#fff,stroke:#333
+    style API3 fill:#4361ee,color:#fff,stroke:#3a56d4
+    style LLM3 fill:#d4a574,color:#1a1a2e,stroke:#c49564
+    style DB3 fill:#336791,color:#fff,stroke:#2a567a
+    style R23 fill:#f38020,color:#fff,stroke:#d97118
+</div>
+</div>
+
+<div class="diagram-section">
+<h3>Cost Model</h3>
+<div class="mermaid">
+graph LR
+    subgraph "Phase 1: Near-Zero Cost"
+        P1C["10K Users<br/>$16-41/month<br/>$0.002-0.004/user"]
+    end
+    subgraph "Phase 2: Premium Revenue"
+        P2C["Free: $0 | Premium: $9.99/mo<br/>Pro: $19.99/mo | Team: $49.99/mo"]
+    end
+    subgraph "LLM Cost per Request"
+        LC["Adaptive Path: $0.018<br/>LLM Assessment: $0.014<br/>Synthesis: $0.027<br/>Mentor: $0.090"]
+    end
+
+    style P1C fill:#2a9d8f,color:#fff
+    style P2C fill:#4361ee,color:#fff
+    style LC fill:#e76f51,color:#fff
+</div>
+</div>
+
+</div>
+
+<div class="footer">
+  Course Companion FTE | Panaversity Agent Factory Hackathon IV | 2026<br/>
+  <i>Open this file in a browser and use Print → Save as PDF to generate architecture-diagram.pdf</i>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#4361ee',
+      primaryTextColor: '#1a1a2e',
+      lineColor: '#555',
+      fontSize: '14px'
+    },
+    flowchart: {
+      useMaxWidth: true,
+      htmlLabels: true,
+      curve: 'basis'
+    }
+  });
+</script>
+</body>
+</html>

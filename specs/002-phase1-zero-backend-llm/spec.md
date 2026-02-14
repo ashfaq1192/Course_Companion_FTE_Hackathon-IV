@@ -96,7 +96,7 @@ Students can access basic course content for free, but premium features require 
 
 ### Functional Requirements
 
-- **FR-001**: System MUST serve course content verbatim from Cloudflare R2 storage (Zero-Backend-LLM principle)
+- **FR-001**: System MUST serve course content verbatim from Cloudflare R2 storage without any processing (Zero-Backend-LLM principle) - Cloudflare R2 is used solely as a static content repository
 - **FR-002**: System MUST provide deterministic navigation between course chapters/modules without intelligent path planning
 - **FR-003**: Users MUST be able to access content through ChatGPT App interface
 - **FR-004**: System MUST grade quizzes using rule-based evaluation without LLM calls (Phase 1)
@@ -109,15 +109,27 @@ Students can access basic course content for free, but premium features require 
 - **FR-011**: Backend MUST NOT perform ANY RAG summarization or processing
 - **FR-012**: Backend MUST NOT perform ANY prompt orchestration or intelligent processing
 - **FR-013**: System MUST maintain 99%+ consistency in content delivery
+- **FR-014**: System MUST authenticate users using OAuth 2.0 with JWT tokens
+- **FR-015**: System MUST store user data, progress tracking, and subscription information in PostgreSQL database
 
 ### Key Entities
 
 - **Student**: Individual user engaging with the course content; has progress records, quiz scores, subscription status
-- **Course Content**: Educational materials including text, images, videos, quizzes stored in Cloudflare R2
+- **Course Content**: Educational materials in structured format (Markdown/JSON) including text, images, videos, quizzes stored in Cloudflare R2
 - **Progress Record**: Tracking data for each student including completed sections, quiz results, learning streaks
-- **Quiz**: Assessment tool with questions, answers, and grading rules tied to specific course sections
+- **Quiz**: Assessment tool with questions in JSON format with predefined question types, answers, and grading rules tied to specific course sections
 - **Subscription**: Defines user access level determining which features and content are available
 - **Agent Skill**: Declarative knowledge in SKILL.md format that guides ChatGPT's educational interactions
+
+## Clarifications
+
+### Session 2026-02-02
+
+- Q: What format will the course content be in to enable effective ChatGPT explanations? → A: Structured text format (Markdown/JSON)
+- Q: What authentication method will be used to identify users and verify subscription status? → A: OAuth 2.0 with JWT tokens
+- Q: Which database technology should be used for storing user data and progress tracking? → A: PostgreSQL
+- Q: What format should quiz questions be stored in to enable effective rule-based grading? → A: JSON format with predefined question types
+- Q: What are the specific response time requirements for different API calls? → A: <200ms for content APIs, <500ms for progress APIs
 
 ## Success Criteria *(mandatory)*
 
@@ -132,3 +144,4 @@ Students can access basic course content for free, but premium features require 
 - **SC-007**: Students can navigate between course sections in under 5 seconds
 - **SC-008**: System maintains 99%+ consistency in educational delivery across all interactions
 - **SC-009**: Zero LLM API calls made by backend services (verified by audit)
+- **SC-010**: Content API calls respond in under 200ms, progress API calls respond in under 500ms
