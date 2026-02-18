@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 480
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./course_companion.db")
@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     # LLM Configuration (for Phase 2 - Hybrid Intelligence)
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
     DEFAULT_LLM_MODEL: str = os.getenv("DEFAULT_LLM_MODEL", "gpt-3.5-turbo")
+    ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
+    CLAUDE_MODEL: str = os.getenv("CLAUDE_MODEL", "claude-sonnet-4-5-20250929")
     ENABLE_HYBRID_INTELLIGENCE: bool = os.getenv("ENABLE_HYBRID_INTELLIGENCE", "false").lower() == "true"
     COST_TRACKING_ENABLED: bool = os.getenv("COST_TRACKING_ENABLED", "false").lower() == "true"
     USER_QUOTA_MONTHLY_REQUESTS: int = int(os.getenv("USER_QUOTA_MONTHLY_REQUESTS", "50"))

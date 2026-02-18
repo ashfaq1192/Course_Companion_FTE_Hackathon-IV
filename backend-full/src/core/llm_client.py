@@ -112,15 +112,88 @@ class OpenAILLMClient(LLMClient):
             raise
 
 
+class AnthropicLLMClient(LLMClient):
+    """
+    Anthropic Claude implementation of the LLMClient interface.
+    """
+
+    def __init__(self):
+        from anthropic import AsyncAnthropic
+        self.client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        self.default_model = settings.CLAUDE_MODEL
+
+    async def generate_completion(self, prompt: str, **kwargs) -> str:
+        """Generate a completion using Anthropic's Messages API."""
+        try:
+            model = kwargs.pop('model', self.default_model)
+            max_tokens = kwargs.pop('max_tokens', 1024)
+
+            response = await self.client.messages.create(
+                model=model,
+                max_tokens=max_tokens,
+                messages=[{"role": "user", "content": prompt}],
+            )
+
+            usage = response.usage
+            logger.info(
+                f"Anthropic completion used {usage.input_tokens}+{usage.output_tokens} tokens"
+            )
+
+            return response.content[0].text
+        except Exception as e:
+            logger.error(f"Error in Anthropic completion: {str(e)}")
+            raise
+
+    async def generate_chat_completion(self, messages: list, **kwargs) -> str:
+        """Generate a chat completion using Anthropic's Messages API."""
+        try:
+            model = kwargs.pop('model', self.default_model)
+            max_tokens = kwargs.pop('max_tokens', 1024)
+
+            # Anthropic expects system message separately
+            system_msg = None
+            chat_messages = []
+            for msg in messages:
+                if msg.get("role") == "system":
+                    system_msg = msg["content"]
+                else:
+                    chat_messages.append(msg)
+
+            create_kwargs = {
+                "model": model,
+                "max_tokens": max_tokens,
+                "messages": chat_messages,
+            }
+            if system_msg:
+                create_kwargs["system"] = system_msg
+
+            response = await self.client.messages.create(**create_kwargs)
+
+            usage = response.usage
+            logger.info(
+                f"Anthropic chat completion used {usage.input_tokens}+{usage.output_tokens} tokens"
+            )
+
+            return response.content[0].text
+        except Exception as e:
+            logger.error(f"Error in Anthropic chat completion: {str(e)}")
+            raise
+
+
 # Global instance of the LLM client
 llm_client: Optional[LLMClient] = None
 
 
-def get_llm_client() -> LLMClient:
+def get_llm_client(provider: str = "openai") -> LLMClient:
     """
-    Get the global LLM client instance, creating it if necessary.
+    Get a LLM client instance for the specified provider.
+
+    Args:
+        provider: 'openai' or 'anthropic'
     """
     global llm_client
+    if provider == "anthropic":
+        return AnthropicLLMClient()
     if llm_client is None:
         llm_client = OpenAILLMClient()
     return llm_client

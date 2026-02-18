@@ -128,6 +128,59 @@ async def grade_assessment_with_llm(
     }
 
 
+@router.post("/hybrid/agent-orchestrate", response_model=dict)
+async def agent_orchestrate(
+    request_data: dict,
+    current_user: User = Depends(require_premium_access),
+):
+    """
+    Route a task to the appropriate OpenAI Agent (L4 — Agents SDK).
+    Accepts {"task": "<natural language request>"} and returns the agent's response.
+    Requires premium subscription.
+    """
+    task = request_data.get("task")
+    if not task:
+        raise HTTPException(status_code=422, detail="Missing required field: task")
+
+    from ..core.agents import run_orchestrator
+
+    try:
+        result = await run_orchestrator(task)
+        return {
+            "agent": result.last_agent.name if result.last_agent else "unknown",
+            "response": result.final_output,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Agent error: {str(e)}")
+
+
+@router.post("/hybrid/claude-agent", response_model=dict)
+async def claude_agent_endpoint(
+    request_data: dict,
+    current_user: User = Depends(require_premium_access),
+):
+    """
+    Route a task to the Claude Agent (L5 — Claude Agent SDK).
+    Accepts {"task": "<natural language request>"} and returns Claude's response.
+    Requires premium subscription.
+    """
+    task = request_data.get("task")
+    if not task:
+        raise HTTPException(status_code=422, detail="Missing required field: task")
+
+    from ..core.claude_agents import run_claude_agent
+
+    try:
+        result = await run_claude_agent(task)
+        return {
+            "provider": "anthropic",
+            "model": result.get("model", "claude"),
+            "result": result,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Claude agent error: {str(e)}")
+
+
 @router.get("/hybrid/cost-metrics", response_model=List[dict])
 def get_cost_metrics(
     period_start: Optional[str] = None,
