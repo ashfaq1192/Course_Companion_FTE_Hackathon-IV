@@ -223,6 +223,64 @@ graph TB
 </div>
 
 <div class="diagram-section">
+<h3>Agent Factory 8-Layer Stack</h3>
+<div class="mermaid">
+graph TB
+    subgraph "L7 — A2A Protocol"
+        A2A["🔗 Agent-to-Agent<br/>POST /a2a/tasks/send<br/>GET /.well-known/agent.json"]
+    end
+
+    subgraph "L6 — Runtime Skills + MCP"
+        SKILLS["📋 4 Agent Skills<br/>concept-explainer | quiz-master<br/>socratic-tutor | progress-motivator"]
+        MCP["🔧 MCP Server (stdio)<br/>4 tools: explain, quiz, tutor, celebrate"]
+    end
+
+    subgraph "L5 — Claude Agent SDK"
+        CLAUDE["🤖 Anthropic SDK<br/>Claude integration"]
+    end
+
+    subgraph "L4 — OpenAI Agents SDK"
+        AGENTS["🧠 AdaptivePathAgent<br/>GradingAgent"]
+    end
+
+    subgraph "L3 — FastAPI Backend"
+        FAST["🔌 REST API<br/>37 routes | JWT Auth"]
+    end
+
+    subgraph "L2 — Dapr Workflows"
+        DAPR["⚙️ Durable Workflows<br/>learning_path_workflow<br/>Redis state | Kafka pub/sub"]
+    end
+
+    subgraph "L1 — Kafka Event Backbone"
+        KAFKA["📨 Event Bus<br/>quiz_completed | content_viewed<br/>progress_updated"]
+    end
+
+    subgraph "L0 — gVisor Sandbox"
+        GVISOR["🛡️ Container Isolation<br/>runtime: runsc"]
+    end
+
+    A2A --> SKILLS & MCP
+    SKILLS --> CLAUDE & AGENTS
+    MCP --> CLAUDE & AGENTS
+    CLAUDE --> FAST
+    AGENTS --> FAST
+    FAST --> DAPR
+    DAPR --> KAFKA
+    KAFKA --> GVISOR
+
+    style A2A fill:#e63946,color:#fff,stroke:#cc3340
+    style SKILLS fill:#f4a261,color:#1a1a2e,stroke:#e09555
+    style MCP fill:#f4a261,color:#1a1a2e,stroke:#e09555
+    style CLAUDE fill:#d4a574,color:#1a1a2e,stroke:#c49564
+    style AGENTS fill:#2a9d8f,color:#fff,stroke:#248f82
+    style FAST fill:#4361ee,color:#fff,stroke:#3a56d4
+    style DAPR fill:#7b2cbf,color:#fff,stroke:#6a24a6
+    style KAFKA fill:#264653,color:#fff,stroke:#1d3640
+    style GVISOR fill:#6c757d,color:#fff,stroke:#5a636a
+</div>
+</div>
+
+<div class="diagram-section">
 <h3>Cost Model</h3>
 <div class="mermaid">
 graph LR

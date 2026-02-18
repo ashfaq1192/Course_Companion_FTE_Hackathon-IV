@@ -13,7 +13,7 @@ from ..models.user import User
 
 
 # Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=4)
 
 # JWT token bearer scheme
 security = HTTPBearer()

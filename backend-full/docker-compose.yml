@@ -1,8 +1,15 @@
 version: '3.8'
 
 services:
+  # -------------------------------------------------------------------------
+  # L0 — Agent Sandbox (gVisor)
+  # To enable gVisor sandboxing, uncomment `runtime: runsc` below.
+  # Requires gVisor installed on the host: https://gvisor.dev/docs/user_guide/install/
+  # NOTE: gVisor is not supported on WSL2; use a native Linux host or VM.
+  # -------------------------------------------------------------------------
   backend:
     build: .
+    # runtime: runsc  # L0 — uncomment on gVisor-enabled hosts
     ports:
       - "8000:8000"
     environment:
@@ -14,13 +21,45 @@ services:
       - CLOUDFLARE_ACCESS_KEY_ID=${CLOUDFLARE_ACCESS_KEY_ID}
       - CLOUDFLARE_SECRET_ACCESS_KEY=${CLOUDFLARE_SECRET_ACCESS_KEY}
       - CLOUDFLARE_R2_BUCKET=${CLOUDFLARE_R2_BUCKET}
+      - KAFKA_BOOTSTRAP_SERVERS=kafka:29092
       - DEBUG=${DEBUG:-false}
     depends_on:
       - db
+      - redis
+      - kafka
     volumes:
-      - .:/app  # Mount the current directory for development
+      - .:/app
     restart: unless-stopped
 
+  # -------------------------------------------------------------------------
+  # L2 — Dapr Sidecar (workflow orchestration, state management, pub/sub)
+  # -------------------------------------------------------------------------
+  backend-dapr:
+    image: "daprio/daprd:1.13.0"
+    command:
+      - "./daprd"
+      - "--app-id"
+      - "course-companion"
+      - "--app-port"
+      - "8000"
+      - "--dapr-http-port"
+      - "3500"
+      - "--dapr-grpc-port"
+      - "50001"
+      - "--resources-path"
+      - "/components"
+      - "--config"
+      - "/config/config.yaml"
+    volumes:
+      - ./dapr/components:/components
+      - ./dapr:/config
+    network_mode: "service:backend"
+    depends_on:
+      - backend
+
+  # -------------------------------------------------------------------------
+  # Database
+  # -------------------------------------------------------------------------
   db:
     image: postgres:15
     environment:
@@ -33,6 +72,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
 
+  # -------------------------------------------------------------------------
+  # Redis (L2 — Dapr state store + caching)
+  # -------------------------------------------------------------------------
   redis:
     image: redis:7-alpine
     ports:
@@ -41,6 +83,40 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
+  # -------------------------------------------------------------------------
+  # L1 — Kafka Event Backbone
+  # -------------------------------------------------------------------------
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/var/lib/zookeeper/data
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    restart: unless-stopped
+
 volumes:
   postgres_data:
   redis_data:
+  zookeeper_data:
+  kafka_data:

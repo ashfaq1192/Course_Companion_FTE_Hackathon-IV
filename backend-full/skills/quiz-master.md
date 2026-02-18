@@ -1,7 +1,7 @@
 # Quiz Guidance Skill
 
 ## Metadata
-- **Skill ID**: QUIZ_GUIDANCE_001
+- **Skill ID**: quiz-master
 - **Category**: Assessment
 - **Version**: 1.0
 - **Author**: Course Companion FTE Team

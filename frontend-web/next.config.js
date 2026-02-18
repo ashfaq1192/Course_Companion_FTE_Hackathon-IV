@@ -8,13 +8,7 @@ const nextConfig = {
     domains: ['localhost', 'your-backend-domain.com'],
   },
   async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/courses',
-        permanent: true,
-      },
-    ]
+    return []
   },
 }
 
