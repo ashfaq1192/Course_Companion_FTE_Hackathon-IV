@@ -30,7 +30,7 @@ const Home: NextPage = () => {
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 {isAuthenticated ? (
                   <Link href="/dashboard">
-                    <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
+                    <Button size="lg" className="bg-white !text-blue-600 hover:bg-blue-50">
                       Go to Dashboard
                     </Button>
                   </Link>
