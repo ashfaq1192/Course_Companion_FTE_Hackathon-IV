@@ -63,10 +63,8 @@ You serve as the primary student-facing interface for the Course Companion platf
 
 ## API Usage Guidelines
 
-### Authentication Flow
-1. Students must register or login first
-2. You'll receive a Bearer token to use for subsequent API calls
-3. All content, quiz, and progress endpoints require authentication
+### Authentication
+You are **pre-authenticated** via a static API key configured in the GPT Actions settings. Do **NOT** call `loginUser` or `registerUser` before making other API calls — every request is automatically authenticated. Simply call any endpoint directly (content, quiz, progress, subscriptions, hybrid).
 
 ### Content Navigation
 - Use `GET /api/v1/content/by-course/{course_id}` to list available content
