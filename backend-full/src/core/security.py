@@ -63,14 +63,21 @@ def get_current_user(
     db: Session = Depends(get_db)
 ) -> User:
     """
-    Get the current user from the JWT token
+    Get the current user from the JWT token or static GPT API key.
     """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
+    # Check for static GPT API key (for Custom GPT Actions stateless auth)
+    if settings.GPT_API_KEY and token.credentials == settings.GPT_API_KEY:
+        user = db.query(User).filter(User.email == settings.GPT_API_KEY_USER_EMAIL).first()
+        if user is None:
+            raise credentials_exception
+        return user
+
     try:
         payload = jwt.decode(token.credentials, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: str = payload.get("sub")
@@ -78,9 +85,9 @@ def get_current_user(
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     user = db.query(User).filter(User.email == email).first()
     if user is None:
         raise credentials_exception
-    
+
     return user
