@@ -26,8 +26,9 @@ const Register: NextPage = () => {
       await register(email, password, fullName);
       // Redirect to dashboard after successful registration
       router.push('/dashboard');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+    } catch (err: any) {
+      const message = err?.response?.data?.detail || 'Registration failed. Please try again.';
+      setError(message);
       console.error('Registration error:', err);
     } finally {
       setIsLoading(false);

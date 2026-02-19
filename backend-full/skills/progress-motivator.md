@@ -1,7 +1,7 @@
 # Progress Celebration Skill
 
 ## Metadata
-- **Skill ID**: PROGRESS_CELEBRATION_001
+- **Skill ID**: progress-motivator
 - **Category**: Motivation
 - **Version**: 1.0
 - **Author**: Course Companion FTE Team

@@ -1,16 +1,14 @@
 openapi: 3.1.0
 info:
   title: Course Companion FTE API
-  description: Backend API for the Course Companion FTE educational platform. Provides content delivery, quiz management, progress tracking, and subscription management.
-  version: 1.0.0
+  description: Backend API for the Course Companion FTE educational platform. Provides content delivery, quiz management, progress tracking, subscription management, and hybrid intelligence features.
+  version: 2.0.0
 servers:
   - url: https://your-deployment-url.com/api/v1
     description: Production server (replace with your actual deployment URL)
-  - url: http://localhost:8000/api/v1
-    description: Local development server
 
 paths:
-  /register:
+  /auth/register:
     post:
       operationId: registerUser
       summary: Register a new user account
@@ -39,7 +37,7 @@ paths:
         "400":
           description: Email already registered
 
-  /login:
+  /auth/login:
     post:
       operationId: loginUser
       summary: Authenticate and get access token
@@ -68,6 +66,20 @@ paths:
                 $ref: "#/components/schemas/Token"
         "401":
           description: Invalid credentials
+
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      summary: Get the current authenticated user's profile
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
 
   /content/{content_id}:
     get:
@@ -254,11 +266,31 @@ paths:
             type: integer
       responses:
         "200":
-          description: Quiz attempt started
+          description: Quiz attempt started with questions
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/QuizAttempt"
+                type: object
+                properties:
+                  attempt_id:
+                    type: integer
+                  questions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        content_id:
+                          type: integer
+                        question_text:
+                          type: string
+                        question_type:
+                          type: string
+                        options:
+                          type: string
+                        difficulty_level:
+                          type: string
 
   /quiz/{content_id}/submit:
     post:
@@ -277,15 +309,19 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                required: [question_id, answer]
-                properties:
-                  question_id:
-                    type: string
-                  answer:
-                    type: string
+              type: object
+              required: [answers]
+              properties:
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    required: [question_id, selected_answer]
+                    properties:
+                      question_id:
+                        type: integer
+                      selected_answer:
+                        type: string
       responses:
         "200":
           description: Quiz grading result
@@ -293,6 +329,17 @@ paths:
             application/json:
               schema:
                 type: object
+                properties:
+                  score:
+                    type: integer
+                  total:
+                    type: integer
+                  percentage:
+                    type: number
+                  results:
+                    type: array
+                    items:
+                      type: object
         "404":
           description: Content not found
 
@@ -425,6 +472,145 @@ paths:
                 $ref: "#/components/schemas/Subscription"
         "404":
           description: No subscription found
+
+  # --- Hybrid Intelligence (Premium) ---
+
+  /hybrid/adaptive-path:
+    get:
+      operationId: getAdaptivePath
+      summary: Get the current adaptive learning path (premium)
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Active adaptive learning path
+          content:
+            application/json:
+              schema:
+                type: object
+        "404":
+          description: No active path found
+        "403":
+          description: Premium subscription required
+    post:
+      operationId: generateAdaptivePath
+      summary: Generate a new adaptive learning path (premium, LLM-powered)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [learning_style, pace]
+              properties:
+                learning_style:
+                  type: string
+                  description: "e.g. visual, reading, hands-on"
+                pace:
+                  type: string
+                  description: "e.g. slow, moderate, fast"
+      responses:
+        "200":
+          description: Generated adaptive learning path
+          content:
+            application/json:
+              schema:
+                type: object
+        "403":
+          description: Premium subscription required
+
+  /hybrid/llm-grade-assessment:
+    post:
+      operationId: gradeWithLLM
+      summary: Submit a free-form answer for LLM grading (premium)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quiz_attempt_id, question_id, answer_text]
+              properties:
+                quiz_attempt_id:
+                  type: integer
+                question_id:
+                  type: string
+                answer_text:
+                  type: string
+                context:
+                  type: object
+      responses:
+        "200":
+          description: LLM grading result
+          content:
+            application/json:
+              schema:
+                type: object
+        "403":
+          description: Premium subscription required
+
+  /hybrid/agent-orchestrate:
+    post:
+      operationId: agentOrchestrate
+      summary: Route a task to the appropriate AI agent (premium, Agents SDK)
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [task]
+              properties:
+                task:
+                  type: string
+                  description: Natural language description of the task
+      responses:
+        "200":
+          description: Agent response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  agent:
+                    type: string
+                  response:
+                    type: string
+        "403":
+          description: Premium subscription required
+
+  /hybrid/cost-metrics:
+    get:
+      operationId: getCostMetrics
+      summary: Get LLM usage cost metrics
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: period_start
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: period_end
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        "200":
+          description: Cost metrics list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
 
 components:
   securitySchemes:

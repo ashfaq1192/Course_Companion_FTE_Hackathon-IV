@@ -83,6 +83,7 @@ describe('AuthContext', () => {
       user: mockUser,
       token: 'mock-token',
     });
+    mockedAuthService.getCurrentUser.mockResolvedValue(mockUser);
     mockedAuthService.isAuthenticated.mockReturnValue(true);
 
     renderWithAuth();
@@ -114,6 +115,7 @@ describe('AuthContext', () => {
       user: mockUser,
       token: 'mock-token',
     });
+    mockedAuthService.getCurrentUser.mockResolvedValue(mockUser);
     mockedAuthService.isAuthenticated.mockReturnValue(true);
 
     renderWithAuth();

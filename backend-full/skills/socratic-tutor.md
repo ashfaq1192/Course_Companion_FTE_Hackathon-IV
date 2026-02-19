@@ -1,7 +1,7 @@
 # Socratic Tutor Skill
 
 ## Metadata
-- **Skill ID**: SOCRATIC_TUTOR_001
+- **Skill ID**: socratic-tutor
 - **Category**: Pedagogy
 - **Version**: 1.0
 - **Author**: Course Companion FTE Team

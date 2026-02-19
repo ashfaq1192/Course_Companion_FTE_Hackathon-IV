@@ -25,8 +25,9 @@ const Login: NextPage = () => {
       await login(email, password);
       // Redirect to dashboard or previous page
       router.push('/dashboard');
-    } catch (err) {
-      setError('Invalid email or password. Please try again.');
+    } catch (err: any) {
+      const message = err?.response?.data?.detail || 'Invalid email or password. Please try again.';
+      setError(message);
       console.error('Login error:', err);
     } finally {
       setIsLoading(false);

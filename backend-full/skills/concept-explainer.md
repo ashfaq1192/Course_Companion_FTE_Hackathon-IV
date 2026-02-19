@@ -1,7 +1,7 @@
 # Course Explanation Skill
 
 ## Metadata
-- **Skill ID**: COURSE_EXPLANATION_001
+- **Skill ID**: concept-explainer
 - **Category**: Content Delivery
 - **Version**: 1.0
 - **Author**: Course Companion FTE Team
