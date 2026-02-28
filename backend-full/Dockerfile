@@ -23,7 +23,7 @@ USER app
 # Expose the port the app runs on
 EXPOSE 8000
 
-# Default port (Railway overrides via $PORT)
+# Default port (Render/Railway override via $PORT env var)
 ENV PORT=8000
 
 # Run the application
