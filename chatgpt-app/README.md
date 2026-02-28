@@ -54,9 +54,13 @@ For production, deploy to a public URL (e.g., Railway, Render, or your preferred
 1. In the Configure tab, click **Create new action**
 2. In the **Schema** field, paste the contents of `openapi-actions.yaml`
 3. Update the `servers[0].url` in the schema to point to your deployed backend URL
-4. Set **Authentication** to **API Key** with:
-   - Auth Type: **Bearer**
-   - Header name: `Authorization`
+4. Set **Authentication** to **OAuth** with:
+   - **Client ID**: `course-companion-fte-gpt`
+   - **Client Secret**: *(value of `OAUTH_CLIENT_SECRET` env var in your Render deployment)*
+   - **Authorization URL**: `https://course-companion-fte.onrender.com/api/v1/oauth/authorize`
+   - **Token URL**: `https://course-companion-fte.onrender.com/api/v1/oauth/token`
+   - **Scope**: `read write`
+   - **Token Exchange Method**: POST request body
 5. Click **Save**
 
 ### 5. Test the GPT

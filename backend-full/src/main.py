@@ -9,6 +9,7 @@ from src.api.subscriptions import router as subscriptions_router
 from src.api.hybrid_intelligence import router as hybrid_intelligence_router
 from src.api.a2a import router as a2a_router
 from src.api.mcp import router as mcp_router
+from src.api.oauth import router as oauth_router
 from src.core.config import settings
 
 
@@ -38,6 +39,7 @@ def create_app() -> FastAPI:
     app.include_router(hybrid_intelligence_router, prefix=settings.API_V1_STR, tags=["Hybrid Intelligence"])
     app.include_router(a2a_router, prefix=settings.API_V1_STR, tags=["A2A Protocol"])
     app.include_router(mcp_router, prefix=settings.API_V1_STR, tags=["MCP"])
+    app.include_router(oauth_router, prefix=settings.API_V1_STR, tags=["OAuth"])
 
     # A2A Agent Card discovery endpoint (spec: /.well-known/agent.json)
     @app.get("/.well-known/agent.json", tags=["A2A Protocol"])

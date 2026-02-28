@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: course-companion-fte
+    runtime: docker
+    dockerContext: backend-full
+    dockerfilePath: backend-full/Dockerfile
+    plan: free
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DEFAULT_LLM_MODEL
+        value: gpt-4o-mini
+      - key: ENABLE_HYBRID_INTELLIGENCE
+        value: "true"
+      - key: COST_TRACKING_ENABLED
+        value: "true"
+      - key: OAUTH_CLIENT_ID
+        value: course-companion-fte-gpt
+      - key: OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GPT_API_KEY_USER_EMAIL
+        value: student@example.com
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
+      - key: CLOUDFLARE_ACCESS_KEY_ID
+        sync: false
+      - key: CLOUDFLARE_SECRET_ACCESS_KEY
+        sync: false
+      - key: CLOUDFLARE_R2_BUCKET
+        value: course-companion-content
+      - key: BACKEND_CORS_ORIGINS
+        value: "http://localhost,http://localhost:3000,https://chat.openai.com,https://chatgpt.com"

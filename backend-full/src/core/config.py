@@ -18,9 +18,13 @@ class Settings(BaseSettings):
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 480
-    # Static API key for Custom GPT Actions (no JWT session management needed)
+    # Static API key for Custom GPT Actions (legacy/dev-only — superseded by OAuth)
     GPT_API_KEY: Optional[str] = os.getenv("GPT_API_KEY")
     GPT_API_KEY_USER_EMAIL: str = os.getenv("GPT_API_KEY_USER_EMAIL", "student@example.com")
+
+    # OAuth 2.0 for Custom GPT per-user authentication
+    OAUTH_CLIENT_ID: str = os.getenv("OAUTH_CLIENT_ID", "course-companion-fte-gpt")
+    OAUTH_CLIENT_SECRET: str = os.getenv("OAUTH_CLIENT_SECRET", "changeme-use-env-in-prod")
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./course_companion.db")

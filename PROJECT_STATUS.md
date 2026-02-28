@@ -23,7 +23,7 @@ d2d0bf4 Add complete implementation: all 3 phases, infrastructure, and fixes
 | Backend Phase 1 API | ✅ E2E Tested | 20 endpoints, all passing |
 | Backend Phase 2 (Full) API | ✅ E2E Tested | 37 routes, hybrid features verified with gpt-4o-mini |
 | Frontend (Phase 3) | ✅ Tested | Next.js 14, 37 tests pass, connected to backend-full |
-| Deployment Config | ✅ Ready | railway.toml + Dockerfiles for both backends |
+| Deployment Config | ✅ Ready | render.yaml + Dockerfiles for both backends (migrated from Railway → Render free tier) |
 | GitHub | ✅ Pushed | `002-phase1-zero-backend-llm` branch |
 
 ## 8-Layer Architecture Implementation Status
@@ -112,7 +112,7 @@ d2d0bf4 Add complete implementation: all 3 phases, infrastructure, and fixes
 | Demo video (5 min MP4) | ⏳ Pending | Screen-record the live app |
 | Architecture diagram PDF | ⏳ Pending | Open `docs/architecture-diagram.html`, print to PDF |
 | Custom GPT setup | ⏳ Pending | Paste instructions + upload YAML in ChatGPT |
-| Production deployment | ⏳ Pending | `railway up` in both backend directories |
+| Production deployment | ⏳ Pending | Deploy `ashfaq1192/course-companion-fte:latest` to Render (see `backend-full/render.yaml`) |
 
 ## Seed Data
 

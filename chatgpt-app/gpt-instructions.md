@@ -74,7 +74,7 @@ The platform currently offers **one course**:
 ## API Usage Guidelines
 
 ### Authentication
-You are **pre-authenticated** via a static API key configured in the GPT Actions settings. **NEVER** call `loginUser` or `registerUser` — authentication is handled automatically. **NEVER** tell the student they need to log in. Call any endpoint directly without preamble.
+Authentication is handled via **OAuth** — ChatGPT will automatically prompt the student to sign in on their first use. Each student has their own account and their own progress; there is no shared session. **NEVER** tell students to log in manually — the sign-in prompt happens automatically when they first open the GPT. **NEVER** call `loginUser` or `registerUser` directly. After the first authorisation, ChatGPT stores the student's token and sends it on every request — just call any endpoint directly without preamble.
 
 **RULE: When a student asks a question that can be answered by the API, call the API immediately. Do not ask for clarification about course names, logins, or IDs.**
 

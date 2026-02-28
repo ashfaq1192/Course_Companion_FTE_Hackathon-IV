@@ -1,10 +1,19 @@
+# OAuth 2.0 Configuration (set in GPT Builder → Configure → Actions → Authentication):
+#   Auth Type:            OAuth
+#   Client ID:            course-companion-fte-gpt
+#   Client Secret:        <value of OAUTH_CLIENT_SECRET in Render env>
+#   Authorization URL:    https://course-companion-fte.onrender.com/api/v1/oauth/authorize
+#   Token URL:            https://course-companion-fte.onrender.com/api/v1/oauth/token
+#   Scope:                read write
+#   Token Exchange Method: POST request body
+
 openapi: 3.1.0
 info:
   title: Course Companion FTE API
   description: Backend API for the Course Companion FTE educational platform. Provides content delivery, quiz management, progress tracking, subscription management, and hybrid intelligence features.
   version: 2.0.0
 servers:
-  - url: https://course-companion-fte-production.up.railway.app/api/v1
+  - url: https://course-companion-fte.onrender.com/api/v1
     description: Production server
 
 paths:
