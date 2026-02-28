@@ -23,3 +23,23 @@ out/
 # OS
 .DS_Store
 Thumbs.db
+
+# Temp / session files
+claude_session*.md
+*.md.md
+
+# Screenshots (keep out of repo)
+s1.png
+s2.png
+s3.png
+a1.png
+
+# Temp / session files
+claude_session*.md
+*.md.md
+
+# Screenshots (keep out of repo)
+s1.png
+s2.png
+s3.png
+a1.png

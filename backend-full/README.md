@@ -1,4 +1,14 @@
-# Course Companion FTE - Phase 1 Backend
+---
+title: Course Companion FTE API
+emoji: 🎓
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
+app_port: 7860
+---
+
+# Course Companion FTE - Backend API
 
 This is the Phase 1 backend for the Course Companion FTE (Full-Time Equivalent Educational Tutor) project. It implements a Zero-Backend-LLM architecture where the backend performs zero LLM inference and ChatGPT handles ALL explanation, tutoring, and adaptation.
 
