@@ -20,11 +20,11 @@ RUN useradd --create-home --shell /bin/bash app \
     && chown -R app:app /app
 USER app
 
-# Expose the port the app runs on
-EXPOSE 8000
+# Expose port 7860 (Hugging Face Spaces default)
+EXPOSE 7860
 
-# Default port (Render/Railway override via $PORT env var)
-ENV PORT=8000
+# Default port 7860 for HF Spaces; override via $PORT env var for other platforms
+ENV PORT=7860
 
 # Run the application
 CMD uvicorn src.main:app --host 0.0.0.0 --port $PORT
