@@ -2,16 +2,32 @@
 
 This repository contains the complete implementation of the Course Companion FTE (Full-Time Equivalent Educational Tutor) as part of Hackathon IV. The project implements a dual-frontend architecture with zero-backend-LLM by default and selective hybrid intelligence.
 
-## 🏆 **Project Status: COMPLETED**
+## 🏆 **Project Status: FINALIZED**
 
-All three phases of Hackathon IV have been successfully implemented:
+All three phases of Hackathon IV have been successfully implemented and deployed to production:
 
 - ✅ **Phase 1**: Zero-Backend-LLM Architecture (Complete)
-- ✅ **Phase 2**: Hybrid Intelligence Features (Complete) 
+- ✅ **Phase 2**: Hybrid Intelligence Features (Complete)
 - ✅ **Phase 3**: Standalone Web Application (Complete)
+
+## 🌐 **Live Deployments**
+
+| Service | URL | Platform |
+|---|---|---|
+| **Frontend (Web App)** | [https://frontend-web-six-theta.vercel.app](https://frontend-web-six-theta.vercel.app) | Vercel |
+| **Backend API** | [https://ashfaq1192-course-companion-fte-api.hf.space](https://ashfaq1192-course-companion-fte-api.hf.space) | Hugging Face Spaces |
+| **API Docs (Swagger)** | [https://ashfaq1192-course-companion-fte-api.hf.space/docs](https://ashfaq1192-course-companion-fte-api.hf.space/docs) | Hugging Face Spaces |
+| **HF Space** | [https://huggingface.co/spaces/ashfaq1192/course-companion-fte-api](https://huggingface.co/spaces/ashfaq1192/course-companion-fte-api) | Hugging Face |
+
+### Demo Credentials
+| Role | Email | Password |
+|---|---|---|
+| Student (Premium) | `student@example.com` | `demo123` |
+| Test User (Premium) | `test@test.com` | `test123456` |
 
 ## 📋 **Table of Contents**
 
+- [Live Deployments](#-live-deployments)
 - [Architecture Overview](#-architecture-overview)
 - [Phase Implementations](#-phase-implementations)
 - [Directory Structure](#-directory-structure)
@@ -197,6 +213,12 @@ NEXT_PUBLIC_WS_BASE_URL=ws://localhost:8000
 OPENAI_API_KEY=your-openai-api-key  # For Phase 2 features
 ```
 
+### Production Environment
+The production frontend is pre-configured to point at the Hugging Face Spaces backend:
+```
+NEXT_PUBLIC_API_BASE_URL=https://ashfaq1192-course-companion-fte-api.hf.space/api/v1
+```
+
 ## ✅ **Validation**
 
 ### Phase 1 Compliance
@@ -246,4 +268,16 @@ The Course Companion FTE project has successfully completed all requirements for
 
 The implementation demonstrates a production-ready Digital FTE that can tutor thousands of students simultaneously, operate 24/7, and maintain 99%+ consistency in educational delivery while scaling from 10 to 100,000 users without linear cost increase.
 
-**Ready for deployment and production use.**
+### Hackathon IV — Final Submission
+
+| Deliverable | Status | Link |
+|---|---|---|
+| Phase 1 Backend (Zero-LLM) | ✅ Live | [API Docs](https://ashfaq1192-course-companion-fte-api.hf.space/docs) |
+| Phase 2 Hybrid Intelligence | ✅ Live | [API Docs](https://ashfaq1192-course-companion-fte-api.hf.space/docs) |
+| Phase 3 Web Application | ✅ Live | [frontend-web-six-theta.vercel.app](https://frontend-web-six-theta.vercel.app) |
+| ChatGPT App / OpenAI Actions | ✅ Complete | `chatgpt-app/` |
+| OpenAPI Specification | ✅ Live | [/api/v1/openapi.json](https://ashfaq1192-course-companion-fte-api.hf.space/api/v1/openapi.json) |
+| Cost Analysis | ✅ Complete | `docs/cost-analysis.md` |
+| Architecture Diagram | ✅ Complete | `docs/architecture-diagram.html` |
+
+**Hackathon IV submission is finalized and all deliverables are live in production.**
