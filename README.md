@@ -18,6 +18,7 @@ All three phases of Hackathon IV have been successfully implemented and deployed
 | **Backend API** | [https://ashfaq1192-course-companion-fte-api.hf.space](https://ashfaq1192-course-companion-fte-api.hf.space) | Hugging Face Spaces |
 | **API Docs (Swagger)** | [https://ashfaq1192-course-companion-fte-api.hf.space/docs](https://ashfaq1192-course-companion-fte-api.hf.space/docs) | Hugging Face Spaces |
 | **HF Space** | [https://huggingface.co/spaces/ashfaq1192/course-companion-fte-api](https://huggingface.co/spaces/ashfaq1192/course-companion-fte-api) | Hugging Face |
+| **Demo Video** | [https://youtu.be/3IopphHBdQY](https://youtu.be/3IopphHBdQY) | YouTube |
 
 ### Demo Credentials
 | Role | Email | Password |
@@ -279,5 +280,6 @@ The implementation demonstrates a production-ready Digital FTE that can tutor th
 | OpenAPI Specification | ✅ Live | [/api/v1/openapi.json](https://ashfaq1192-course-companion-fte-api.hf.space/api/v1/openapi.json) |
 | Cost Analysis | ✅ Complete | `docs/cost-analysis.md` |
 | Architecture Diagram | ✅ Complete | `docs/architecture-diagram.html` |
+| Demo Video (5 min) | ✅ Complete | [youtu.be/3IopphHBdQY](https://youtu.be/3IopphHBdQY) |
 
 **Hackathon IV submission is finalized and all deliverables are live in production.**
